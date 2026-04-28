@@ -28,6 +28,7 @@ EOF
 )
 
 echo "============================================"
+echo "  Cuando la orden no llega"
 echo "  E-Commerce Event-Driven Demo"
 echo "============================================"
 echo ""

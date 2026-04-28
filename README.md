@@ -1,8 +1,8 @@
-# E-Commerce Event-Driven Platform on AWS
+# Cuando la orden no llega: Lo que aprendí construyendo un ecommerce event-driven en AWS
 
-Real-time and batch processing architecture for e-commerce, built with AWS managed services and Terraform.
+> *Diseñar para fallar es el secreto para no fallar jamás.* Descubre cómo construir un flujo de órdenes indestructible con SNS, SQS y Lambda. Una sesión de lecciones aprendidas sobre observabilidad real y resiliencia event-driven, donde cada mensaje cuenta y solo pagas por lo que procesas.
 
-> 🎤 Demo project for AWS User Group Arequipa — May 15, 2026
+> 🎤 AWS User Group Arequipa — 15 de mayo, 2026
 
 ## Architecture Overview
 
