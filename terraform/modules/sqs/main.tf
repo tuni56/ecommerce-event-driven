@@ -11,10 +11,16 @@ variable "name" {
   type        = string
 }
 
+variable "subscribe_to_sns" {
+  description = "Whether to create an SNS subscription"
+  type        = bool
+  default     = false
+}
+
 variable "sns_topic_arn" {
   description = "SNS topic ARN to subscribe to"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "visibility_timeout" {
@@ -64,14 +70,14 @@ resource "aws_sqs_queue" "this" {
 
 # --- SNS Subscription (optional) ---
 resource "aws_sns_topic_subscription" "this" {
-  count     = var.sns_topic_arn != null ? 1 : 0
+  count     = var.subscribe_to_sns ? 1 : 0
   topic_arn = var.sns_topic_arn
   protocol  = "sqs"
   endpoint  = aws_sqs_queue.this.arn
 }
 
 resource "aws_sqs_queue_policy" "sns_publish" {
-  count     = var.sns_topic_arn != null ? 1 : 0
+  count     = var.subscribe_to_sns ? 1 : 0
   queue_url = aws_sqs_queue.this.id
 
   policy = jsonencode({

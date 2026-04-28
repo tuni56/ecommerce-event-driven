@@ -22,6 +22,7 @@ module "sqs_order_processing" {
   source             = "../../modules/sqs"
   project            = local.prefix
   name               = "order-processing"
+  subscribe_to_sns   = true
   sns_topic_arn      = module.sns_orders.topic_arn
   visibility_timeout = 60
   tags               = local.tags
@@ -31,6 +32,7 @@ module "sqs_inventory" {
   source             = "../../modules/sqs"
   project            = local.prefix
   name               = "inventory-update"
+  subscribe_to_sns   = true
   sns_topic_arn      = module.sns_orders.topic_arn
   visibility_timeout = 60
   tags               = local.tags
@@ -40,6 +42,7 @@ module "sqs_analytics" {
   source             = "../../modules/sqs"
   project            = local.prefix
   name               = "analytics-ingestion"
+  subscribe_to_sns   = true
   sns_topic_arn      = module.sns_orders.topic_arn
   visibility_timeout = 60
   tags               = local.tags
@@ -103,6 +106,7 @@ module "lambda_order_processor" {
   project              = local.prefix
   function_name        = "order-processor"
   source_dir           = "${local.lambda_base_path}/order-processor/src"
+  enable_sqs_trigger   = true
   sqs_event_source_arn = module.sqs_order_processing.queue_arn
   timeout              = 10
   tags                 = local.tags
@@ -119,6 +123,7 @@ module "lambda_inventory_updater" {
   project              = local.prefix
   function_name        = "inventory-updater"
   source_dir           = "${local.lambda_base_path}/inventory-updater/src"
+  enable_sqs_trigger   = true
   sqs_event_source_arn = module.sqs_inventory.queue_arn
   timeout              = 10
   tags                 = local.tags
@@ -135,6 +140,7 @@ module "lambda_analytics_ingester" {
   project              = local.prefix
   function_name        = "analytics-ingester"
   source_dir           = "${local.lambda_base_path}/analytics-ingester/src"
+  enable_sqs_trigger   = true
   sqs_event_source_arn = module.sqs_analytics.queue_arn
   timeout              = 10
   tags                 = local.tags

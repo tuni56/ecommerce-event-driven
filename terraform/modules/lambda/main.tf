@@ -43,10 +43,16 @@ variable "environment_variables" {
   default     = {}
 }
 
+variable "enable_sqs_trigger" {
+  description = "Whether to create SQS event source mapping"
+  type        = bool
+  default     = false
+}
+
 variable "sqs_event_source_arn" {
   description = "SQS queue ARN to use as event source"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "sqs_batch_size" {
@@ -90,7 +96,7 @@ resource "aws_iam_role_policy_attachment" "basic" {
 }
 
 resource "aws_iam_role_policy_attachment" "sqs" {
-  count      = var.sqs_event_source_arn != null ? 1 : 0
+  count      = var.enable_sqs_trigger ? 1 : 0
   role       = aws_iam_role.this.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
@@ -128,7 +134,7 @@ resource "aws_lambda_function" "this" {
 
 # --- SQS Event Source Mapping ---
 resource "aws_lambda_event_source_mapping" "sqs" {
-  count            = var.sqs_event_source_arn != null ? 1 : 0
+  count            = var.enable_sqs_trigger ? 1 : 0
   event_source_arn = var.sqs_event_source_arn
   function_name    = aws_lambda_function.this.arn
   batch_size       = var.sqs_batch_size
