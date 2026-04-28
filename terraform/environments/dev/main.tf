@@ -153,18 +153,47 @@ module "lambda_analytics_ingester" {
 }
 
 # ============================================================
-# Monitoring — DLQ alarms
+# SNS — Alarm notifications
+# ============================================================
+module "sns_alarms" {
+  source  = "../../modules/sns"
+  project = local.prefix
+  name    = "alarms"
+  tags    = local.tags
+}
+
+resource "aws_sns_topic_subscription" "alarm_email" {
+  topic_arn = module.sns_alarms.topic_arn
+  protocol  = "email"
+  endpoint  = var.alarm_email
+}
+
+# ============================================================
+# Monitoring — DLQ alarms + Dashboard
 # ============================================================
 module "monitoring" {
-  source  = "../../modules/monitoring"
-  project = local.prefix
-  tags    = local.tags
+  source              = "../../modules/monitoring"
+  project             = local.prefix
+  sns_alarm_topic_arn = module.sns_alarms.topic_arn
+  tags                = local.tags
 
   dlq_alarms = {
     "${local.prefix}-order-processing-dlq"    = module.sqs_order_processing.dlq_arn
     "${local.prefix}-inventory-update-dlq"    = module.sqs_inventory.dlq_arn
     "${local.prefix}-analytics-ingestion-dlq" = module.sqs_analytics.dlq_arn
   }
+
+  lambda_function_names = [
+    module.lambda_order_processor.function_name,
+    module.lambda_inventory_updater.function_name,
+    module.lambda_analytics_ingester.function_name,
+  ]
+
+  sqs_queue_names = [
+    module.sqs_order_processing.queue_name,
+    module.sqs_inventory.queue_name,
+    module.sqs_analytics.queue_name,
+  ]
 }
 
 # ============================================================
