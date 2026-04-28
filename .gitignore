@@ -3,6 +3,7 @@
 *.tfstate
 *.tfstate.*
 *.tfplan
+tfplan
 .terraform.lock.hcl
 terraform/modules/lambda/.build/
 
